@@ -4,14 +4,21 @@ train_datasets:
     input_fields:
       - "audio"
       - "sentence"
-      -
+
+  - name: "parambharat/ucla_dataset"
+    split: "train"
+    input_fields:
+      - "audio"
+      - "sentence"
+
+
 eval_datasets:
   - name: "parambharat/tamil_asr_corpus"
     split: "test"
     input_fields:
       - "audio"
       - "sentence"
-      -
+
 preprocessing:
   text:
     remove_special_characters: True
