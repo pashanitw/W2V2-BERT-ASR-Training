@@ -70,7 +70,7 @@ def prepare_dataset(dynamic_datasets):
             sampling_rate = config.sampling_rate
 
             # Load the dataset
-            dataset = load_dataset(dataset_name, split=f"{split}[:100]")
+            dataset = load_dataset(dataset_name, split=split)
 
             # Ensure the audio field exists before casting
             if audio_field in dataset.column_names:
