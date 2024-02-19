@@ -5,13 +5,6 @@ train_datasets:
       - "audio"
       - "sentence"
 
-  - name: "parambharat/ucla_dataset"
-    split: "train"
-    input_fields:
-      - "audio"
-      - "sentence"
-
-
 eval_datasets:
   - name: "parambharat/tamil_asr_corpus"
     split: "test"
@@ -27,7 +20,7 @@ preprocessing:
     remove_latin_characters: False
 
 
-train_batch_size: 16
+train_batch_size: 4
 num_workers: 8
 debug: False
 result_path: "results"
@@ -35,11 +28,11 @@ exp_name: "w2v_bert"
 sampling_rate: 16000
 warmup_steps: 100
 learning_rate: 5e-5
-save_steps: 600
-eval_steps: 300
+save_steps: 50
+eval_steps: 50
 logging_steps: 300
 save_total_limit: 2
 push_to_hub: False
-gradient_checkpointing: True
+gradient_checkpointing: False
 train_epochs: 10
 gradient_accumulation_steps: 2
