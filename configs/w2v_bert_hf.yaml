@@ -19,7 +19,6 @@ preprocessing:
     remove_punctuation: True
     remove_latin_characters: False
 
-
 train_batch_size: 4
 num_workers: 8
 debug: False
