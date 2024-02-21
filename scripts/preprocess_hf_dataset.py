@@ -51,14 +51,17 @@ def prepare_dataset(dynamic_datasets):
 
     for dataset_config in dynamic_datasets:
         try:
-            dataset_name = dataset_config.name
+            dataset = dataset_config.dataset
             split = dataset_config.split
             audio_field = dataset_config.input_fields[0]
             text_field = dataset_config.input_fields[1]
             sampling_rate = config.sampling_rate
 
             # Load the dataset
-            dataset = load_dataset(dataset_name, split=split)
+            if "name" in dataset_config:
+                dataset = load_dataset(dataset, dataset_config.name, split=split)
+            else:
+                dataset = load_dataset(dataset, split=split)
             # dataset = load_dataset(dataset_name, split=f"{split}[:1000]")
 
 
@@ -66,13 +69,13 @@ def prepare_dataset(dynamic_datasets):
             if audio_field in dataset.column_names:
                 dataset = dataset.cast_column(audio_field, Audio(sampling_rate))
             else:
-                raise ValueError(f"The audio field {audio_field} does not exist in the dataset {dataset_name}.")
+                raise ValueError(f"The audio field {audio_field} does not exist in the dataset {dataset}.")
 
             # Rename the text field if necessary
             if text_field in dataset.column_names and text_field != "sentence":
                 dataset = dataset.rename_column(text_field, "sentence")
             elif text_field not in dataset.column_names:
-                raise ValueError(f"The text field {text_field} does not exist in the dataset {dataset_name}.")
+                raise ValueError(f"The text field {text_field} does not exist in the dataset {dataset}.")
 
             # Remove unwanted columns
             required_columns = ["audio", "sentence"]
@@ -82,7 +85,7 @@ def prepare_dataset(dynamic_datasets):
             combined_dataset.append(dataset)
         except Exception as e:
             # Instead of printing the error, you can raise it to exit the function
-            raise Exception(f"An error occurred while preparing the dataset {dataset_name}: {e}")
+            raise Exception(f"An error occurred while preparing the dataset {dataset}: {e}")
 
     # Concatenate and shuffle datasets
     ds_to_return = concatenate_datasets(combined_dataset)
