@@ -116,8 +116,6 @@ print('DATASET PREPARATION IN PROGRESS...')
 raw_dataset = DatasetDict()
 raw_dataset["train"] = load_from_disk(f"{script_args.preprocessed_dataset}/train")
 raw_dataset["eval"] = load_from_disk(f"{script_args.preprocessed_dataset}/val")
-print(raw_dataset["train"].column_names)
-raw_dataset = raw_dataset.cast_column("audio", Audio(sampling_rate=16000))
 
 
 data_collator = DataCollatorCTCWithPadding(processor=processor, padding=True)

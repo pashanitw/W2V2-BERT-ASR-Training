@@ -14,8 +14,8 @@ from functools import partial
 
 def save_vocab_json(vocab_dict, path):
     save_path = Path(path) / "vocab.json"
-    with open(save_path, 'w') as vocab_file:
-        json.dump(vocab_dict, vocab_file)
+    with open(save_path, 'w', encoding='utf-8') as vocab_file:
+        json.dump(vocab_dict, vocab_file, ensure_ascii=False)
 
 def clean_up_data(batch, config):
     # Precompile the regex pattern if 'remove_special_characters' is enabled
@@ -89,7 +89,7 @@ def prepare_dataset(dynamic_datasets):
     ds_to_return = ds_to_return.shuffle(seed=22)
 
     ds_to_return = normalize_dataset(ds_to_return, config)
-    vocab = ds_to_return.map(create_vocabulary, batched=True, batch_size=-1, keep_in_memory=True,
+    vocab = ds_to_return.map(create_vocabulary, batched=True, batch_size=-1, keep_in_memory=False,
                                          remove_columns=ds_to_return.column_names, num_proc=8)
 
     return vocab, ds_to_return
@@ -150,15 +150,17 @@ if __name__ == '__main__':
 
     preprocess_fn = partial(preprocess_dataset, processor=processor)
 
-    required_columns = ["audio", "sentence"]
-    columns_to_remove = set(train_set.column_names) - set(required_columns)
 
-    train_set = train_set.map(preprocess_fn, remove_columns=columns_to_remove, num_proc=16)
-    val_set = val_set.map(preprocess_fn, remove_columns=columns_to_remove, num_proc=16)
+    columns_to_remove = ["audio", "sentence"]
+
+    train_set = train_set.map(preprocess_fn, remove_columns=columns_to_remove, num_proc=16, load_from_cache_file=False)
+    val_set = val_set.map(preprocess_fn, remove_columns=columns_to_remove,  num_proc=16, load_from_cache_file=False)
 
     train_set.save_to_disk(Path(args.preprocessed_dataset) / "train")
     val_set.save_to_disk(Path(args.preprocessed_dataset) / "val")
 
+    train_set.cleanup_cache_files()
+    val_set.cleanup_cache_files()
 
 
 
