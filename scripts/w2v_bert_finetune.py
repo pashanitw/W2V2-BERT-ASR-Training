@@ -1,5 +1,4 @@
 import torch
-import argparse
 from sconf import Config
 import os
 from os.path import basename
