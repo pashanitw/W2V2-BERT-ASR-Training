@@ -1,0 +1,45 @@
+train_datasets:
+  - dataset: "mozilla-foundation/common_voice_16_0"
+    name: "ka"
+    split: "train+validation"
+    input_fields:
+      - "audio"
+      - "sentence"
+  - dataset: "mozilla-foundation/common_voice_16_0"
+    name: "ka"
+    split: "test[:-1000]"
+    input_fields:
+      - "audio"
+      - "sentence"
+
+eval_datasets:
+  - dataset: "mozilla-foundation/common_voice_16_0"
+    name: "ka"
+    split: "test[-1000:]"
+    input_fields:
+      - "audio"
+      - "sentence"
+
+preprocessing:
+  text:
+    remove_special_characters: True
+    lowercase: True
+    remove_punctuation: True
+    remove_latin_characters: False
+
+train_batch_size: 4
+num_workers: 8
+debug: False
+result_path: "results"
+exp_name: "kannada"
+sampling_rate: 16000
+warmup_steps: 1000
+learning_rate: 5e-5
+save_steps: 600
+eval_steps: 500
+logging_steps: 500
+save_total_limit: 2
+push_to_hub: False
+gradient_checkpointing: False
+train_epochs: 10
+gradient_accumulation_steps: 2

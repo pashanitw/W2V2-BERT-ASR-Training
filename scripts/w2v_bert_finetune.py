@@ -136,13 +136,13 @@ model = Wav2Vec2BertForCTC.from_pretrained(
 
 training_args = TrainingArguments(
     output_dir=save_path,
-    group_by_length=True,
+    group_by_length=False,
     per_device_train_batch_size=config.train_batch_size,
     gradient_accumulation_steps=config.gradient_accumulation_steps,
     evaluation_strategy="steps",
     num_train_epochs=config.train_epochs,
     gradient_checkpointing=config.gradient_checkpointing,
-    fp16=True,
+    bf16=True,
     save_steps=config.save_steps,
     eval_steps=config.eval_steps,
     logging_steps=config.logging_steps,
@@ -162,7 +162,9 @@ trainer = Trainer(
     tokenizer=processor.feature_extractor,
 )
 
+
 trainer.train()
+
 
 
 
