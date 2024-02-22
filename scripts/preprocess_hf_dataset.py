@@ -100,9 +100,10 @@ def prepare_dataset(dynamic_datasets):
 
 def preprocess_dataset(batch, processor):
     audio = batch["audio"]
+    audio_length_seconds = len(audio["array"]) / audio["sampling_rate"]
     batch["input_features"] = processor(audio["array"], sampling_rate=audio["sampling_rate"]).input_features[0]
     batch["input_length"] = len(batch["input_features"])
-
+    batch["length_in_seconds"] = audio_length_seconds
     batch["labels"] = processor(text=batch["sentence"]).input_ids
     return batch
 

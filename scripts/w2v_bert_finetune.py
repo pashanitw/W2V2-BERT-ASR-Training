@@ -11,6 +11,12 @@ from transformers import SeamlessM4TFeatureExtractor, Wav2Vec2BertProcessor,\
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union, Required
 
+
+MAX_DURATION_IN_SECONDS = 30.0
+MIN_DURATION_IN_SECONDS = 3.0
+def is_audio_length_in_range(input_length):
+    return input_length < MAX_DURATION_IN_SECONDS and input_length > MIN_DURATION_IN_SECONDS
+
 def save_config_file(config, path):
     if not Path(path).exists():
         os.makedirs(path)
@@ -114,8 +120,10 @@ processor = Wav2Vec2BertProcessor(feature_extractor=feature_extractor, tokenizer
 print('DATASET PREPARATION IN PROGRESS...')
 raw_dataset = DatasetDict()
 raw_dataset["train"] = load_from_disk(f"{script_args.preprocessed_dataset}/train")
+
 raw_dataset["eval"] = load_from_disk(f"{script_args.preprocessed_dataset}/val")
 
+raw_dataset = raw_dataset.filter(is_audio_length_in_range, input_columns=["length_in_seconds"])
 
 data_collator = DataCollatorCTCWithPadding(processor=processor, padding=True)
 
@@ -132,11 +140,14 @@ model = Wav2Vec2BertForCTC.from_pretrained(
     vocab_size=len(processor.tokenizer),
 )
 
+model.config.ctc_zero_infinity = True
+
 
 
 training_args = TrainingArguments(
     output_dir=save_path,
-    group_by_length=False,
+    group_by_length=True,
+    length_column_name="input_length",
     per_device_train_batch_size=config.train_batch_size,
     gradient_accumulation_steps=config.gradient_accumulation_steps,
     evaluation_strategy="steps",

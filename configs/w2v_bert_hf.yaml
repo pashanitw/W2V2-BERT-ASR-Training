@@ -1,15 +1,13 @@
 train_datasets:
-  - dataset: "mozilla-foundation/common_voice_16_0"
-    name: "ta"
-    split: "train"
+  - dataset: "parambharat/ucla_dataset"
+    split: "train[:-200]"
     input_fields:
       - "audio"
       - "sentence"
 
 eval_datasets:
-  - dataset: "mozilla-foundation/common_voice_16_0"
-    name: "mn"
-    split: "test"
+  - dataset: "parambharat/ucla_dataset"
+    split: "train[-200:]"
     input_fields:
       - "audio"
       - "sentence"
@@ -25,7 +23,7 @@ train_batch_size: 4
 num_workers: 8
 debug: False
 result_path: "results"
-exp_name: "w2v_bert"
+exp_name: "tamil"
 sampling_rate: 16000
 warmup_steps: 500
 learning_rate: 5e-5
