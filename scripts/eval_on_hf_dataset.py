@@ -1,8 +1,10 @@
 import torch
-import os
 import argparse
+import os
+from pathlib import Path
 import evaluate
 from tqdm import tqdm
+import shutil
 from datasets import load_dataset, Audio
 from transformers import  Wav2Vec2BertProcessor,Wav2Vec2BertForCTC
 
@@ -50,7 +52,13 @@ def data(dataset):
 
 
 def main(args):
-    model_id = args.hf_model
+    ckpt_dir_parent = str(Path(args.ckpt_dir).parent)
+    if not os.path.exists(f"{args.ckpt_dir}/vocab.json"):
+        shutil.copy2(f"{ckpt_dir_parent}/vocab.json", f"{args.ckpt_dir}/vocab.json")
+    else:
+        print(f"Loading vocab.json from {args.ckpt_dir}")
+
+    model_id = args.ckpt_dir
     model = Wav2Vec2BertForCTC.from_pretrained(model_id).to("cuda")
     processor = Wav2Vec2BertProcessor.from_pretrained(model_id,  unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
     dataset = load_dataset(
@@ -59,18 +67,15 @@ def main(args):
         split=args.split,
         use_auth_token=True,
     )
-
     text_column_name = get_text_column_names(dataset.column_names)
     dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
     dataset = dataset.filter(is_target_text_in_range, input_columns=[text_column_name], num_proc=2)
-    # dataset.set_format(type='torch', columns=['audio'])
     predictions = []
     references = []
     with torch.no_grad():
         for item in tqdm(data(dataset), total=len(dataset), desc='Decode Progress'):
             input_features = processor(item["array"], sampling_rate=item["sampling_rate"], return_tensors="pt").input_features[0]
             input_features = input_features.to("cuda").unsqueeze(0)
-            print(input_features)
             logits = model(input_features).logits
             pred_ids = torch.argmax(logits, dim=-1)[0]
             pred_text = processor.decode(pred_ids)
@@ -91,32 +96,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--hf_model",
-        type=str,
-        required=True,
-        help="Huggingface model name or trained checkpoint path.",
-    )
-    parser.add_argument(
         "--ckpt_dir",
         type=str,
-        required=False,
-        default=".",
+        required=True,
         help="Folder with the pytorch_model.bin file",
     )
-    parser.add_argument(
-        "--temp_ckpt_folder",
-        type=str,
-        required=False,
-        default="temp_dir",
-        help="Path to create a temporary folder containing the model and related files needed for inference",
-    )
-    parser.add_argument(
-        "--language",
-        type=str,
-        required=False,
-        default="hi",
-        help="Two letter language code for the transcription language, e.g. use 'hi' for Hindi. This helps initialize the tokenizer.",
-    )
+
     parser.add_argument(
         "--dataset",
         type=str,
@@ -125,10 +110,9 @@ if __name__ == "__main__":
         help="Dataset from huggingface to evaluate the model on. Example: mozilla-foundation/common_voice_11_0",
     )
     parser.add_argument(
-        "--config",
+        "--name",
         type=str,
-        required=False,
-        default="hi",
+        required=True,
         help="Config of the dataset. Eg. 'hi' for the Hindi split of Common Voice",
     )
     parser.add_argument(
@@ -137,27 +121,6 @@ if __name__ == "__main__":
         required=False,
         default="test",
         help="Split of the dataset. Eg. 'test'",
-    )
-    parser.add_argument(
-        "--device",
-        type=int,
-        required=False,
-        default=0,
-        help="The device to run the pipeline on. -1 for CPU, 0 for the first GPU (default) and so on.",
-    )
-    parser.add_argument(
-        "--batch_size",
-        type=int,
-        required=False,
-        default=16,
-        help="Number of samples to go through each streamed batch.",
-    )
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        required=False,
-        default="predictions_dir",
-        help="Output directory for the predictions and hypotheses generated.",
     )
 
     args = parser.parse_args()

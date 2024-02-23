@@ -10,7 +10,7 @@ from transformers import SeamlessM4TFeatureExtractor, Wav2Vec2BertProcessor,\
     Wav2Vec2CTCTokenizer, Wav2Vec2BertForCTC, TrainingArguments, Trainer, HfArgumentParser
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union, Required
-
+import shutil
 
 MAX_DURATION_IN_SECONDS = 30.0
 MIN_DURATION_IN_SECONDS = 3.0
@@ -25,6 +25,14 @@ def save_config_file(config, path):
     with open(save_path, "w") as f:
         f.write(config.dumps(modified_color=None, quote_str=True))
         print(f"Config is saved at {save_path}")
+
+
+def save_vocab_file(source, dest):
+    if not os.path.exists(source):
+        raise FileNotFoundError(f"the source file does not exist at path {source}")
+
+    shutil.copy2(source, dest)
+    print(f"file copied at path {dest}")
 
 
 @dataclass
@@ -107,6 +115,7 @@ save_path = Path(config.result_path) / config.exp_name / config.exp_version
 
 save_config_file(config, save_path)
 
+save_vocab_file(f"{script_args.preprocessed_dataset}/vocab.json", save_path/"vocab.json")
 
 tokenizer = Wav2Vec2CTCTokenizer.from_pretrained(script_args.preprocessed_dataset, unk_token="[UNK]", pad_token="[PAD]",
                                                  word_delimiter_token="|")

@@ -73,3 +73,26 @@ The repository includes configuration files (`configs/w2v_bert_hf.yaml`) with th
 
 You can modify these parameters in the configuration file according to your requirements.
 
+## Evaluation
+- `--ckpt_dir`: Required. The directory containing the pytorch_model.bin file of the model you wish to evaluate.
+- `--dataset`: Required. The dataset identifier on the Hugging Face Hub to evaluate the model on. Default is mozilla-foundation/common_voice_11_0.
+- `--name`: Required. The configuration of the dataset. For example, use 'hi' for the Hindi split of the Common Voice dataset.
+- `--split`: The specific split of the dataset to evaluate on. Default is test.
+
+### Example command 
+
+``` bash
+python scripts/eval_on_hf_dataset.py \
+  --ckpt_dir path/to/your/model_checkpoint_directory \
+  --dataset google/fleurs \
+  --name ka_ge \
+  --split test
+```
+## Push To Hub
+If everything appears to be in order and you wish to push to the hub, execute the following command:
+
+``` bash
+python push_to_hub.py \
+--ckpt_dir path/to/your/model_checkpoint_directory \
+--name model_name
+```
