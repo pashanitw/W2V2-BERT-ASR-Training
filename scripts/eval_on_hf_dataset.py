@@ -63,7 +63,7 @@ def main(args):
     processor = Wav2Vec2BertProcessor.from_pretrained(model_id,  unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
     dataset = load_dataset(
         args.dataset,
-        args.config,
+        args.name,
         split=args.split,
         use_auth_token=True,
     )

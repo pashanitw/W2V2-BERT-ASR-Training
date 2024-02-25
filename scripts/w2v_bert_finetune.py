@@ -94,8 +94,8 @@ class ScriptArguments:
     preprocessed_dataset: Optional[str] = field( metadata={"help": "preprocessed hugginface dataset"})
     exp_version: Optional[str] = field(default="", metadata={"help": "experiment version"})
     config_file: Optional[str] = field(default="", metadata={"help": "please provide if there is a config file !"})
-
-
+    resume_from_checkpoint: Optional[bool] = field(default=False, metadata={"help": "please provide if there is a config file !"})
+    ckpt_dir_path: Optional[str] = field(default=None, metadata={"help": ""})
 
 parser = HfArgumentParser(ScriptArguments)
 script_args = parser.parse_args_into_dataclasses()[0]
@@ -111,11 +111,14 @@ config.exp_version = (
     if not script_args.exp_version
     else script_args.exp_version
 )
-save_path = Path(config.result_path) / config.exp_name / config.exp_version
+if not script_args.resume_from_checkpoint:
+    save_path = Path(config.result_path) / config.exp_name / config.exp_version
 
-save_config_file(config, save_path)
+    save_config_file(config, save_path)
 
-save_vocab_file(f"{script_args.preprocessed_dataset}/vocab.json", save_path/"vocab.json")
+    save_vocab_file(f"{script_args.preprocessed_dataset}/vocab.json", save_path/"vocab.json")
+else:
+    save_path = script_args.ckpt_dir_path
 
 tokenizer = Wav2Vec2CTCTokenizer.from_pretrained(script_args.preprocessed_dataset, unk_token="[UNK]", pad_token="[PAD]",
                                                  word_delimiter_token="|")
@@ -183,7 +186,7 @@ trainer = Trainer(
 )
 
 
-trainer.train()
+trainer.train(resume_from_checkpoint=script_args.resume_from_checkpoint)
 
 
 

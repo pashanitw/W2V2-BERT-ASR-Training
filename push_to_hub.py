@@ -2,7 +2,7 @@ import argparse
 import os
 from pathlib import Path
 import shutil
-from transformers import Wav2Vec2BertForCTC
+from transformers import Wav2Vec2BertForCTC, Wav2Vec2BertProcessor
 
 
 def main(args):
@@ -14,6 +14,10 @@ def main(args):
 
     model_id = args.ckpt_dir
     model = Wav2Vec2BertForCTC.from_pretrained(model_id)
+    processor = Wav2Vec2BertProcessor.from_pretrained(model_id,  unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
+
+    model.push_to_hub(args.name)
+    processor.push_to_hub(args.name)
 
 
 
