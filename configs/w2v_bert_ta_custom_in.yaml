@@ -1,6 +1,20 @@
 train_datasets:
+  - dataset: "./custom_telugu_dataset"
+    custom: True
+    split: "train"
+    input_fields:
+      - "audio"
+      - "sentence"
+
+  - dataset: "./custom_telugu_dataset"
+    custom: True
+    split: "val"
+    input_fields:
+      - "audio"
+      - "sentence"
+
   - dataset: "mozilla-foundation/common_voice_16_1"
-    name: "ml"
+    name: "te"
     split: "train+validation+other"
     input_fields:
       - "audio"
@@ -8,7 +22,7 @@ train_datasets:
 
 eval_datasets:
   - dataset: "mozilla-foundation/common_voice_16_1"
-    name: "ml"
+    name: "te"
     split: "test"
     input_fields:
       - "audio"
@@ -21,19 +35,21 @@ preprocessing:
     remove_punctuation: True
     remove_latin_characters: False
 
-train_batch_size: 4
+pretrained_model: "facebook/w2v-bert-2.0"
+train_batch_size: 8
+eval_batch_size: 1
 num_workers: 8
 debug: False
 result_path: "results"
-exp_name: "malayalam"
+exp_name: "telugu_model"
 sampling_rate: 16000
-warmup_steps: 1000
+warmup_steps: 100
 learning_rate: 5e-5
-save_steps: 200
+save_steps: 100
 eval_steps: 100
 logging_steps: 500
 save_total_limit: 2
 push_to_hub: False
-gradient_checkpointing: False
+gradient_checkpointing: True
 train_epochs: 10
-gradient_accumulation_steps: 2
+gradient_accumulation_steps: 4

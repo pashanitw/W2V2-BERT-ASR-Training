@@ -12,8 +12,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union, Required
 import shutil
 
-MAX_DURATION_IN_SECONDS = 30.0
-MIN_DURATION_IN_SECONDS = 3.0
+MAX_DURATION_IN_SECONDS = 40.0
+MIN_DURATION_IN_SECONDS = 1.0
 def is_audio_length_in_range(input_length):
     return input_length < MAX_DURATION_IN_SECONDS and input_length > MIN_DURATION_IN_SECONDS
 
@@ -137,10 +137,11 @@ raw_dataset["eval"] = load_from_disk(f"{script_args.preprocessed_dataset}/val")
 
 raw_dataset = raw_dataset.filter(is_audio_length_in_range, input_columns=["length_in_seconds"])
 
+
 data_collator = DataCollatorCTCWithPadding(processor=processor, padding=True)
 
 model = Wav2Vec2BertForCTC.from_pretrained(
-    "facebook/w2v-bert-2.0",
+    config.pretrained_model,
     attention_dropout=0.0,
     hidden_dropout=0.0,
     feat_proj_dropout=0.0,
@@ -150,8 +151,9 @@ model = Wav2Vec2BertForCTC.from_pretrained(
     add_adapter=True,
     pad_token_id=processor.tokenizer.pad_token_id,
     vocab_size=len(processor.tokenizer),
+    ignore_mismatched_sizes=True
 )
-
+# model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant":False})
 model.config.ctc_zero_infinity = True
 
 
@@ -161,17 +163,21 @@ training_args = TrainingArguments(
     group_by_length=True,
     length_column_name="input_length",
     per_device_train_batch_size=config.train_batch_size,
+    per_device_eval_batch_size = config.eval_batch_size,
     gradient_accumulation_steps=config.gradient_accumulation_steps,
     evaluation_strategy="steps",
     num_train_epochs=config.train_epochs,
     gradient_checkpointing=config.gradient_checkpointing,
-    bf16=True,
+    fp16=True,
     save_steps=config.save_steps,
     eval_steps=config.eval_steps,
     logging_steps=config.logging_steps,
     learning_rate=config.learning_rate,
     warmup_steps=config.warmup_steps,
     save_total_limit=config.save_total_limit,
+    load_best_model_at_end=True,
+    metric_for_best_model="eval_wer",
+    gradient_checkpointing_kwargs={'use_reentrant': False}
 
 )
 

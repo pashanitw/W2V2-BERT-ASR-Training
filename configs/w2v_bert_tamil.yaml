@@ -1,20 +1,28 @@
 train_datasets:
-  - dataset: "mozilla-foundation/common_voice_16_0"
-    name: "ka"
-    split: "train+validation"
+  - dataset: "./tamil_miles"
+    custom: True
+    split: "train"
     input_fields:
       - "audio"
       - "sentence"
-  - dataset: "mozilla-foundation/common_voice_16_0"
-    name: "ka"
+
+  - dataset: "./tamil_miles"
+    custom: True
     split: "test"
+    input_fields:
+      - "audio"
+      - "sentence"
+
+  - dataset: "./tamil_slr"
+    custom: True
+    split: "train"
     input_fields:
       - "audio"
       - "sentence"
 
 eval_datasets:
   - dataset: "google/fleurs"
-    name: "ka_ga"
+    name: "ta_in"
     split: "test"
     input_fields:
       - "audio"
@@ -29,18 +37,21 @@ preprocessing:
 
 pretrained_model: "facebook/w2v-bert-2.0",
 train_batch_size: 16
-num_workers: 8
+eval_batch_size: 4
+num_workers: 16
 debug: False
 result_path: "results"
-exp_name: "georgian"
+exp_name: "tamil_model"
 sampling_rate: 16000
-warmup_steps: 1000
+warmup_steps: 0
 learning_rate: 5e-5
 save_steps: 1000
 eval_steps: 500
 logging_steps: 500
-save_total_limit: 2
+save_total_limit: 4
 push_to_hub: False
 gradient_checkpointing: True
 train_epochs: 10
-gradient_accumulation_steps: 2
+gradient_accumulation_steps: 1
+resume_from_checkpoint: False
+ckpt_dir_path: ""

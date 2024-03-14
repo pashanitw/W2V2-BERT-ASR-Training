@@ -1,3 +1,8 @@
 results/
 .idea/
 preprocessed
+tmp/
+./miles_preprocess.py
+*.csv
+*.tsv
+dataset
