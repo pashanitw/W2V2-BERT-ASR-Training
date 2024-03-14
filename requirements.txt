@@ -6,3 +6,4 @@ transformers>=4.37.2
 librosa
 pydub
 soundfile
+typing

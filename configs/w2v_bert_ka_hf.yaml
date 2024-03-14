@@ -29,6 +29,7 @@ preprocessing:
 
 pretrained_model: "facebook/w2v-bert-2.0"
 train_batch_size: 16
+eval_batch_size: 4
 num_workers: 8
 debug: False
 result_path: "results"

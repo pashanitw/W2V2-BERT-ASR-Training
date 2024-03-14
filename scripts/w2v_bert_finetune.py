@@ -9,7 +9,7 @@ import numpy as np
 from transformers import SeamlessM4TFeatureExtractor, Wav2Vec2BertProcessor,\
     Wav2Vec2CTCTokenizer, Wav2Vec2BertForCTC, TrainingArguments, Trainer, HfArgumentParser
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Union, Required
+from typing import Any, Dict, List, Optional, Union
 import shutil
 
 MAX_DURATION_IN_SECONDS = 40.0
