@@ -14,7 +14,7 @@ train_datasets:
 
 eval_datasets:
   - dataset: "google/fleurs"
-    name: "ka_ga"
+    name: "ka_ge"
     split: "test"
     input_fields:
       - "audio"
@@ -27,7 +27,7 @@ preprocessing:
     remove_punctuation: True
     remove_latin_characters: False
 
-pretrained_model: "facebook/w2v-bert-2.0",
+pretrained_model: "facebook/w2v-bert-2.0"
 train_batch_size: 16
 num_workers: 8
 debug: False

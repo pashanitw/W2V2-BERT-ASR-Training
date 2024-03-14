@@ -36,7 +36,7 @@ pip install -r requirements.txt
 To preprocess the dataset, run the following command:
 
 ```bash
-python scripts/preprocess_hf_dataset.py --config configs/w2v_bert_hf.yaml --preprocessed_dataset preprocessed
+python scripts/preprocess_data.py --config configs/w2v_bert_hf.yaml --preprocessed_dataset preprocessed
 ```
 
 ### Training

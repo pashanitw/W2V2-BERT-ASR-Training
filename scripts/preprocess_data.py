@@ -183,16 +183,15 @@ if __name__ == '__main__':
 
     vocab_train, train_set = prepare_dataset(config.train_datasets)
     vocab_test, val_set = prepare_dataset(config.eval_datasets)
-    # vocab_list = list(set(vocab_train["vocab"][0]) | set(vocab_test["vocab"][0]))
-    # vocab_dict = {v: k for k, v in enumerate(sorted(vocab_list))}
-    #
-    # vocab_dict["|"] = vocab_dict[" "]
-    # del vocab_dict[" "]
-    # vocab_dict["[UNK]"] = len(vocab_dict)
-    # vocab_dict["[PAD]"] = len(vocab_dict)
-    #
-    # save_vocab_json(vocab_dict, args.preprocessed_dataset)
-    shutil.copyfile("./results/tamil_model/20240310_015923/vocab.json", f"{args.preprocessed_dataset}/vocab.json")
+    vocab_list = list(set(vocab_train["vocab"][0]) | set(vocab_test["vocab"][0]))
+    vocab_dict = {v: k for k, v in enumerate(sorted(vocab_list))}
+
+    vocab_dict["|"] = vocab_dict[" "]
+    del vocab_dict[" "]
+    vocab_dict["[UNK]"] = len(vocab_dict)
+    vocab_dict["[PAD]"] = len(vocab_dict)
+
+    save_vocab_json(vocab_dict, args.preprocessed_dataset)
 
     tokenizer = Wav2Vec2CTCTokenizer.from_pretrained(args.preprocessed_dataset, unk_token="[UNK]", pad_token="[PAD]",
                                                      word_delimiter_token="|")

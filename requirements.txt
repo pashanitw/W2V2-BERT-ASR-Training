@@ -4,3 +4,4 @@ jiwer==3.0.3
 sconf==0.2.5
 transformers>=4.37.2
 pydub
+soundfile
