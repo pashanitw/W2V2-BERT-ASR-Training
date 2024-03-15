@@ -6,3 +6,4 @@ tmp/
 *.csv
 *.tsv
 dataset
+georgian_dataset/
