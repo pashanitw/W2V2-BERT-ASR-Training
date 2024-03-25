@@ -4,7 +4,6 @@ from sconf import Config
 import os
 from pathlib import Path
 from datasets import load_dataset,Audio, concatenate_datasets
-
 import re
 import json
 from transformers import SeamlessM4TFeatureExtractor, Wav2Vec2BertProcessor,\
@@ -55,7 +54,7 @@ def normalize_dataset(dataset, config):
 
     cleanup_fn = partial(clean_up_data, config=config)
     # Apply the preprocessing function to the dataset
-    return dataset.map(cleanup_fn, num_proc=4)  # Ensure batched=True if the function expects batched inputs
+    return dataset.map(cleanup_fn, num_proc=config.num_workers)  # Ensure batched=True if the function expects batched inputs
 
 
 def create_vocabulary(batch):
@@ -64,7 +63,7 @@ def create_vocabulary(batch):
     return {"vocab": [vocab], "all_text": [all_text]}
 
 
-def prepare_dataset(dynamic_datasets):
+def prepare_dataset(dynamic_datasets, num_workers):
     combined_dataset = []
 
     for dataset_config in dynamic_datasets:
@@ -113,7 +112,7 @@ def prepare_dataset(dynamic_datasets):
 
     ds_to_return = normalize_dataset(ds_to_return, config)
     vocab = ds_to_return.map(create_vocabulary, batched=True, batch_size=-1, keep_in_memory=False,
-                                         remove_columns=ds_to_return.column_names, num_proc=4)
+                                         remove_columns=ds_to_return.column_names, num_proc=num_workers)
 
     return vocab, ds_to_return
 
@@ -181,8 +180,8 @@ if __name__ == '__main__':
     recreate_directory(args.preprocessed_dataset)
 
 
-    vocab_train, train_set = prepare_dataset(config.train_datasets)
-    vocab_test, val_set = prepare_dataset(config.eval_datasets)
+    vocab_train, train_set = prepare_dataset(config.train_datasets, config.num_workers)
+    vocab_test, val_set = prepare_dataset(config.eval_datasets, config.num_workers)
     vocab_list = list(set(vocab_train["vocab"][0]) | set(vocab_test["vocab"][0]))
     vocab_dict = {v: k for k, v in enumerate(sorted(vocab_list))}
 
@@ -208,8 +207,8 @@ if __name__ == '__main__':
 
     columns_to_remove = ["audio", "sentence"]
 
-    train_set = train_set.map(preprocess_fn, remove_columns=columns_to_remove, num_proc=4, load_from_cache_file=False)
-    val_set = val_set.map(preprocess_fn, remove_columns=columns_to_remove,  num_proc=4, load_from_cache_file=False)
+    train_set = train_set.map(preprocess_fn, remove_columns=columns_to_remove, num_proc=config.num_workers, load_from_cache_file=False)
+    val_set = val_set.map(preprocess_fn, remove_columns=columns_to_remove,  num_proc=config.num_workers, load_from_cache_file=False)
 
     train_set.save_to_disk(Path(args.preprocessed_dataset) / "train")
     val_set.save_to_disk(Path(args.preprocessed_dataset) / "val")

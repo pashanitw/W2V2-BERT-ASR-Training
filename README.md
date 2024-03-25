@@ -182,24 +182,37 @@ To give you a clear picture, here’s how your dataset structure should look:
     └── ...
 ```
 
-### Referencing Custom Data Sample
+### Reference for custom data
 
 For a sample of how your custom data should be structured, refer to the `custom_data` folder. This folder contains example audio and text files arranged according to the specifications mentioned above. It serves as a guide for preparing your datasets for training and testing.
 ## Evaluation
-- `--ckpt_dir`: Required. The directory containing the pytorch_model.bin file of the model you wish to evaluate.
-- `--dataset`: Required. The dataset identifier on the Hugging Face Hub to evaluate the model on. Default is mozilla-foundation/common_voice_11_0.
-- `--name`: Required. The configuration of the dataset. For example, use 'hi' for the Hindi split of the Common Voice dataset.
-- `--split`: The specific split of the dataset to evaluate on. Default is test.
-
-### Example command 
 This part explains how to check the model's performance using Hugging Face datasets.
-
+### Example command
 ``` bash
 python scripts/eval_on_hf_dataset.py \
   --ckpt_dir path/to/your/model_checkpoint_directory \
   --dataset google/fleurs \
   --name ka_ge \
   --split test
+```
+- `--ckpt_dir`: Required. The directory containing the pytorch_model.bin file of the model you wish to evaluate.
+- `--dataset`: Required. The dataset identifier on the Hugging Face Hub to evaluate the model on. Default is mozilla-foundation/common_voice_11_0.
+- `--name`: Required. The configuration of the dataset. For example, use 'hi' for the Hindi split of the Common Voice dataset.
+- `--split`: The specific split of the dataset to evaluate on. Default is test.
+
+## Resuming Training from a Checkpoint
+To resume the training process from a previously saved checkpoint, you need to modify the YAML configuration file. Update the following parameters:
+
+- `resume_from_checkpoint`: Set this parameter to `True` to enable resuming from a checkpoint.
+- `ckpt_dir_path`: Specify the path to the directory where the checkpoint files are stored.
+
+### Example Configuration
+
+Here's an example of how you can update the YAML configuration to resume training from a checkpoint:
+
+```yaml
+resume_from_checkpoint: True
+ckpt_dir_path: "/path/to/results/folder"
 ```
 ## Push To Hub
 If everything appears to be in order and you wish to push to the hub, execute the following command:
