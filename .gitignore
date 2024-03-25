@@ -7,3 +7,5 @@ tmp/
 *.tsv
 dataset
 georgian_dataset/
+*.mp3
+*.wav
