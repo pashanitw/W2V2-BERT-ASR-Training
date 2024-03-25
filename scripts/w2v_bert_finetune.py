@@ -94,8 +94,6 @@ class ScriptArguments:
     preprocessed_dataset: Optional[str] = field( metadata={"help": "preprocessed hugginface dataset"})
     exp_version: Optional[str] = field(default="", metadata={"help": "experiment version"})
     config_file: Optional[str] = field(default="", metadata={"help": "please provide if there is a config file !"})
-    resume_from_checkpoint: Optional[bool] = field(default=False, metadata={"help": "please provide if there is a config file !"})
-    ckpt_dir_path: Optional[str] = field(default=None, metadata={"help": ""})
 
 parser = HfArgumentParser(ScriptArguments)
 script_args = parser.parse_args_into_dataclasses()[0]
@@ -111,7 +109,7 @@ config.exp_version = (
     if not script_args.exp_version
     else script_args.exp_version
 )
-if not script_args.resume_from_checkpoint:
+if not config.resume_from_checkpoint:
     save_path = Path(config.result_path) / config.exp_name / config.exp_version
 
     save_config_file(config, save_path)
