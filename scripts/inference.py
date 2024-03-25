@@ -19,7 +19,7 @@ def inference(args):
                                                       word_delimiter_token="|")
 
     with torch.no_grad():
-        wav, sr = librosa.load(args.audio_file)
+        wav, sr = librosa.load(args.audio_file, sr=16000)
         input_features = processor(wav, sampling_rate=sr, return_tensors="pt").input_features[0]
         input_features = input_features.to("cuda").unsqueeze(0)
         logits = model(input_features).logits
