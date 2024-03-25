@@ -118,7 +118,7 @@ if not script_args.resume_from_checkpoint:
 
     save_vocab_file(f"{script_args.preprocessed_dataset}/vocab.json", save_path/"vocab.json")
 else:
-    save_path = script_args.ckpt_dir_path
+    save_path = config.ckpt_dir_path
 
 tokenizer = Wav2Vec2CTCTokenizer.from_pretrained(script_args.preprocessed_dataset, unk_token="[UNK]", pad_token="[PAD]",
                                                  word_delimiter_token="|")
@@ -192,7 +192,7 @@ trainer = Trainer(
 )
 
 
-trainer.train(resume_from_checkpoint=script_args.resume_from_checkpoint)
+trainer.train(resume_from_checkpoint=config.resume_from_checkpoint)
 
 
 
